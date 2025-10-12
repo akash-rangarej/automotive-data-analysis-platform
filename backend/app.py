@@ -1,12 +1,13 @@
-from flask import Flask, jsonify, request, send_file
+from flask import Flask, jsonify, request, send_file, send_from_directory
 import pandas as pd
 import json
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import io
 import numpy as np
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../frontend/build', static_url_path='')
 CORS(app)
 
 class CustomJSONEncoder(json.JSONEncoder):
@@ -25,6 +26,15 @@ app.json_encoder = CustomJSONEncoder
 # Store dataset globally
 uploaded_data = None
 fname = None
+
+# Serve React App
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve(path):
+    if path != "" and os.path.exists(app.static_folder + '/' + path):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
 
 @app.route("/upload_file", methods=['POST'])
 def upload_file():
