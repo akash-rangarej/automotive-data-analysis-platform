@@ -2,7 +2,9 @@ import React, { useState } from "react";
 
 function GetProcessedData() {
   const [selectedStep, setSelectedStep] = useState("");
+  const [error, setError] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
+  const [target_column, setTarget_column] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleStepProcessing = async () => {
@@ -12,6 +14,8 @@ function GetProcessedData() {
     }
 
     setIsProcessing(true);
+    setError(""); // Clear previous errors
+    
     try {
       const response = await fetch("http://localhost:5000/get_processed_data", {
         method: "POST",
@@ -20,14 +24,27 @@ function GetProcessedData() {
         },
         body: JSON.stringify({
           processing_type: selectedStep,
+          target_column: target_column,
           model_type: null
         })
       });
 
+      // Check if response is OK
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // Try to parse error message from response
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
+      // Check if response is JSON (error) or blob (success)
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        // It's a JSON error response
+        const errorData = await response.json();
+        throw new Error(errorData.error);
+      }
+
+      // It's a CSV file - proceed with download
       const blob = await response.blob();
       
       // Create download link
@@ -42,7 +59,7 @@ function GetProcessedData() {
       
     } catch (error) {
       console.error("Error processing data:", error);
-      alert("Error processing data. Please try again.");
+      setError(error.message); // Set error state to show on page
     } finally {
       setIsProcessing(false);
     }
@@ -55,6 +72,8 @@ function GetProcessedData() {
     }
 
     setIsProcessing(true);
+    setError(""); // Clear previous errors
+    
     try {
       const response = await fetch("http://localhost:5000/get_processed_data", {
         method: "POST",
@@ -67,8 +86,17 @@ function GetProcessedData() {
         })
       });
 
+      // Check if response is OK
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      // Check if response is JSON (error) or blob (success)
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const errorData = await response.json();
+        throw new Error(errorData.error);
       }
 
       const blob = await response.blob();
@@ -85,7 +113,7 @@ function GetProcessedData() {
       
     } catch (error) {
       console.error("Error processing data:", error);
-      alert("Error processing data. Please try again.");
+      setError(error.message); // Set error state to show on page
     } finally {
       setIsProcessing(false);
     }
@@ -94,6 +122,13 @@ function GetProcessedData() {
   return (
     <div className="processed-data">
       <h2>Processed Data</h2>
+      
+      {/* Show error message prominently */}
+      {error && (
+        <div className="error-message" style={{color: 'red', padding: '10px', border: '1px solid red', margin: '10px 0'}}>
+           {error}
+        </div>
+      )}
       
       <div className="processing-options">
         <h3>Individual Processing Steps</h3>
@@ -106,14 +141,22 @@ function GetProcessedData() {
           <option value="scale_features">Scale the Dataset</option>
           <option value="remove_outliers">Remove Outliers</option>
           <option value="encode_categorical">Encode Categorical Data</option>
-          <option value="normalize_features">Normalize Features</option>
         </select>
+
         <button 
           onClick={handleStepProcessing} 
           disabled={isProcessing}
         >
           {isProcessing ? "Processing..." : "Process Data"}
         </button>
+        {selectedStep==="encode_categorical"?
+        <input 
+          type="text" 
+          placeholder="Enter categorical target column name(if available) or 'no'" 
+          onChange={(e)=>setTarget_column(e.target.value)}
+          style={{marginLeft: '10px', padding: '5px', width:'380px'}}
+        />:''
+        }
       </div>
 
       <div className="full-pipeline">
@@ -131,6 +174,12 @@ function GetProcessedData() {
           <option value="neural_network">Neural Network</option>
           <option value="distance_based_models">Distance-based Models (KNN, PCA)</option>
         </select>
+         <input 
+          type="text" 
+          placeholder="Enter categorical target column name(if available) or 'no'" 
+          onChange={(e)=>setTarget_column(e.target.value)}
+          style={{marginLeft: '10px', padding: '5px', width:'380px'}}
+        />
         <button 
           onClick={handleFullPipeline} 
           disabled={isProcessing}
