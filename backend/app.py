@@ -156,9 +156,9 @@ def generate_plot():
         elif plot_function == 'piechart':
             if not column:
                 return jsonify({'error': 'Column is required for pie chart'}), 400
-            if column.dtype != "O":
+            if uploaded_data[column].dtype != "O":
                 return jsonify({"error":"the provided column is not an categorical data"}), 400
-                image_b64 = piechart(uploaded_data, column,title)
+            image_b64 = piechart(uploaded_data, column,title)
 
         elif plot_function == 'boxplot':
             if not column:

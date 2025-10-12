@@ -18,7 +18,7 @@ const Visualize = () => {
         const Data = await response.json();
         setDatacols(Data.columns || []);
       } catch (error) {
-        console.error('Error fetching columns:', error);
+        console.error('Error fetching columns');
       }
     };
     
@@ -58,22 +58,21 @@ const Visualize = () => {
         body: JSON.stringify(requestBody),
       });
       
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-      
       const data = await response.json();
       
       if (data.error) {
-        throw new Error(data.error);
+        setError(data.error);
       }
       
       setPlotImage(`data:image/png;base64,${data.image}`);
       setPlotType(plotFunction);
-    } catch (error) {
-      console.error('Error generating plot:', error);
-      setError(error.message || 'Failed to generate plot');
-    } finally {
+    } 
+    
+    catch (error) {
+      setError(error || 'Failed to generate plot');
+    }
+    
+    finally {
       setLoading(false);
     }
   };
@@ -220,7 +219,7 @@ const Visualize = () => {
         <div>
           {
             loading?
-            'Generating'
+            'Generating...'
             :
             <img 
             src={plotImage} 

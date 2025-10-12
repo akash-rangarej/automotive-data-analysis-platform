@@ -12,8 +12,16 @@ function GetInfo() {
     setCurrentAnalysis(analysisType);
     try {
       const response = await fetch(`http://localhost:5000/${analysisType}`);
-      if (!response.ok) throw new Error("Network response was not ok");
+      
+      // Parse the response first to get the backend error message
       const data = await response.json();
+      
+      // Then check if the response was ok
+      if (!response.ok) {
+        // Use the backend error message if available, otherwise use generic message
+        throw new Error(data.error || "Something went wrong");
+      }
+      
       setAnalysisData(data.data); // Access the data property from backend response
     } catch (err) {
       setError(err.message);
@@ -116,6 +124,18 @@ function GetInfo() {
         );
 
       case "get_value_counts":
+        // Check if analysisData is empty (no categorical columns)
+        if (analysisData.length === 0) {
+          return (
+            <div>
+              <h3>Value Counts</h3>
+              <p style={{ color: "#666", fontStyle: "italic", marginTop: "20px" }}>
+                No categorical data available to show as value counts
+              </p>
+            </div>
+          );
+        }
+        
         return (
           <div>
             <h3>Value Counts</h3>
@@ -179,7 +199,7 @@ function GetInfo() {
         </div>
 
         {loading && <p>Loading...</p>}
-        {error && <p style={{ color: "red" }}>Error: {error}</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
         {analysisData && renderAnalysisResults()}
       </div>
     </div>
