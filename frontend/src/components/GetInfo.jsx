@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./GetInfo.css";
 
 function GetInfo() {
   const [analysisData, setAnalysisData] = useState(null);
@@ -13,16 +14,13 @@ function GetInfo() {
     try {
       const response = await fetch(`http://localhost:5000/${analysisType}`);
       
-      // Parse the response first to get the backend error message
       const data = await response.json();
       
-      // Then check if the response was ok
       if (!response.ok) {
-        // Use the backend error message if available, otherwise use generic message
         throw new Error(data.error || "Something went wrong");
       }
       
-      setAnalysisData(data.data); // Access the data property from backend response
+      setAnalysisData(data.data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -30,31 +28,12 @@ function GetInfo() {
     }
   };
 
-  const tableStyle = {
-    width: "100%",
-    borderCollapse: "collapse",
-    marginTop: "20px",
-  };
-
-  const cellStyle = {
-    border: "1px solid #ddd",
-    padding: "8px",
-    textAlign: "left",
-  };
-
-  const headerStyle = {
-    ...cellStyle,
-    backgroundColor: "#f4f4f4",
-    fontWeight: "bold",
-  };
-
   const renderAnalysisResults = () => {
     if (!analysisData) return null;
 
-    // All data from backend is now arrays, so we can safely check
     if (!Array.isArray(analysisData)) {
       return (
-        <div>
+        <div className="analysis-results">
           <h3>Analysis Results</h3>
           <pre>{JSON.stringify(analysisData, null, 2)}</pre>
         </div>
@@ -64,15 +43,15 @@ function GetInfo() {
     switch (currentAnalysis) {
       case "get_nulls":
         return (
-          <div>
-            <h3>Null Values Count</h3>
-            <table style={tableStyle}>
+          <div className="analysis-results get_nulls">
+            <h3>Null Values Analysis</h3>
+            <table className="analysis-table">
               <thead>
                 <tr>
-                  <th style={headerStyle}>Column</th>
-                  <th style={headerStyle}>Null Count</th>
-                  <th style={headerStyle}>Total Values</th>
-                  <th style={headerStyle}>Null Percentage</th>
+                  <th>Column</th>
+                  <th>Null Count</th>
+                  <th>Total Values</th>
+                  <th>Null Percentage</th>
                 </tr>
               </thead>
               <tbody>
@@ -80,10 +59,10 @@ function GetInfo() {
                   const nullPercentage = ((item.null_count / item.total_values) * 100).toFixed(2);
                   return (
                     <tr key={index}>
-                      <td style={cellStyle}>{item.column}</td>
-                      <td style={cellStyle}>{item.null_count}</td>
-                      <td style={cellStyle}>{item.total_values}</td>
-                      <td style={cellStyle}>{nullPercentage}%</td>
+                      <td>{item.column}</td>
+                      <td>{item.null_count}</td>
+                      <td>{item.total_values}</td>
+                      <td>{nullPercentage}%</td>
                     </tr>
                   );
                 })}
@@ -94,28 +73,28 @@ function GetInfo() {
 
       case "get_outliers":
         return (
-          <div>
+          <div className="analysis-results get_outliers">
             <h3>Outliers Analysis</h3>
-            <table style={tableStyle}>
+            <table className="analysis-table">
               <thead>
                 <tr>
-                  <th style={headerStyle}>Column</th>
-                  <th style={headerStyle}>Outliers Count</th>
-                  <th style={headerStyle}>Outlier Percentage</th>
-                  <th style={headerStyle}>Lower Fence</th>
-                  <th style={headerStyle}>Upper Fence</th>
-                  <th style={headerStyle}>Total Values</th>
+                  <th>Column</th>
+                  <th>Outliers Count</th>
+                  <th>Outlier Percentage</th>
+                  <th>Lower Fence</th>
+                  <th>Upper Fence</th>
+                  <th>Total Values</th>
                 </tr>
               </thead>
               <tbody>
                 {analysisData.map((item, index) => (
                   <tr key={index}>
-                    <td style={cellStyle}>{item.column}</td>
-                    <td style={cellStyle}>{item.outliers_count}</td>
-                    <td style={cellStyle}>{item.outlier_percentage}</td>
-                    <td style={cellStyle}>{item.lower_fence?.toFixed(2)}</td>
-                    <td style={cellStyle}>{item.upper_fence?.toFixed(2)}</td>
-                    <td style={cellStyle}>{item.total_values}</td>
+                    <td>{item.column}</td>
+                    <td>{item.outliers_count}</td>
+                    <td>{item.outlier_percentage}</td>
+                    <td>{item.lower_fence?.toFixed(2)}</td>
+                    <td>{item.upper_fence?.toFixed(2)}</td>
+                    <td>{item.total_values}</td>
                   </tr>
                 ))}
               </tbody>
@@ -124,30 +103,29 @@ function GetInfo() {
         );
 
       case "get_value_counts":
-        // Check if analysisData is empty (no categorical columns)
         if (analysisData.length === 0) {
           return (
-            <div>
+            <div className="analysis-results get_value_counts">
               <h3>Value Counts</h3>
-              <p style={{ color: "#666", fontStyle: "italic", marginTop: "20px" }}>
+              <div className="no-data-message">
                 No categorical data available to show as value counts
-              </p>
+              </div>
             </div>
           );
         }
         
         return (
-          <div>
+          <div className="analysis-results get_value_counts">
             <h3>Value Counts</h3>
             {analysisData.map((item, index) => (
-              <div key={index} style={{ marginBottom: "20px" }}>
+              <div key={index} style={{ marginBottom: "2rem" }}>
                 <h4>{item.column} Value Counts (Top 5):</h4>
-                <table style={tableStyle}>
+                <table className="analysis-table">
                   <thead>
                     <tr>
-                      <th style={headerStyle}>Value</th>
-                      <th style={headerStyle}>Count</th>
-                      <th style={headerStyle}>Percentage</th>
+                      <th>Value</th>
+                      <th>Count</th>
+                      <th>Percentage</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -155,9 +133,9 @@ function GetInfo() {
                       const percentage = ((count / item.total_values) * 100).toFixed(2);
                       return (
                         <tr key={value}>
-                          <td style={cellStyle}>{value || '(Empty)'}</td>
-                          <td style={cellStyle}>{count}</td>
-                          <td style={cellStyle}>{percentage}%</td>
+                          <td>{value || '(Empty)'}</td>
+                          <td>{count}</td>
+                          <td>{percentage}%</td>
                         </tr>
                       );
                     })}
@@ -177,29 +155,43 @@ function GetInfo() {
     <div className="get-info">
       <h2>Dataset Information</h2>
       <div className="info-container">
-        <div className="analysis-buttons" style={{ marginBottom: "20px" }}>
+        <div className="analysis-buttons">
           <button
+            className="analysis-btn"
             onClick={() => handleAnalysis("get_nulls")}
-            style={{ margin: "0 10px" }}
           >
-            Get No. of Nulls
+            <span>🔍</span>
+            Get Null Values
           </button>
           <button
+            className="analysis-btn"
             onClick={() => handleAnalysis("get_outliers")}
-            style={{ margin: "0 10px" }}
           >
-            Get No. of Outliers
+            <span>📊</span>
+            Get Outliers
           </button>
           <button
+            className="analysis-btn"
             onClick={() => handleAnalysis("get_value_counts")}
-            style={{ margin: "0 10px" }}
           >
+            <span>📈</span>
             Get Value Counts
           </button>
         </div>
 
-        {loading && <p>Loading...</p>}
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {loading && (
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            Analyzing dataset...
+          </div>
+        )}
+        
+        {error && (
+          <div className="error-state">
+            {error}
+          </div>
+        )}
+        
         {analysisData && renderAnalysisResults()}
       </div>
     </div>

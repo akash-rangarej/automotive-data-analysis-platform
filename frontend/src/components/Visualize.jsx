@@ -1,4 +1,5 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import "./Visualize.css";
 
 const Visualize = () => {
   const [plotImage, setPlotImage] = useState('');
@@ -11,7 +12,7 @@ const Visualize = () => {
   const [title, setTitle] = useState('');
   const [datacols, setDatacols] = useState([]);
 
- useEffect(() => {
+  useEffect(() => {
     const fetchColumns = async () => {
       try {
         const response = await fetch('http://localhost:5000/get_columns');
@@ -30,11 +31,11 @@ const Visualize = () => {
     setError('');
     
     try {
-      const requestBody = { plot_function: plotFunction,
-        title:title
-       };
+      const requestBody = { 
+        plot_function: plotFunction,
+        title: title
+      };
       
-      // Add required parameters based on plot type
       if (['lineplot', 'barplot', 'scatterplot'].includes(plotFunction)) {
         if (!selectedX || !selectedY) {
           setError('Please select both X and Y columns');
@@ -86,152 +87,132 @@ const Visualize = () => {
     }
   };
 
+  const plotButtons = [
+    { type: 'lineplot', label: 'Line Plot' },
+    { type: 'barplot', label: 'Bar Plot' },
+    { type: 'scatterplot', label: 'Scatter Plot' },
+    { type: 'piechart', label: 'Pie Chart' },
+    { type: 'heatmap', label: 'Heatmap' },
+    { type: 'boxplot', label: 'Box Plot' },
+    { type: 'histogram', label: 'Histogram' },
+    { type: 'pairplot', label: 'Pair Plot' }
+  ];
+
   return (
-    <div style={{ padding: '20px' }}>
+    <div className="visualize">
       <h2>Data Visualization</h2>
       
-      {/* Column Selection */}
-      <div style={{ marginBottom: '20px' }}>
-        <label style={{ marginRight: '10px' }}>
-          X Column:
-          <select 
-            value={selectedX} 
-            onChange={(e) => setSelectedX(e.target.value)}
-            style={{ marginLeft: '5px' }}
-          >
-            <option value="">Select X column</option>
-            {datacols?.map(col => (
-              <option key={col} value={col}>{col}</option>
-            ))}
-          </select>
-        </label>
-        
-        <label style={{ marginRight: '10px', marginLeft: '15px' }}>
-          Y Column:
-          <select 
-            value={selectedY} 
-            onChange={(e) => setSelectedY(e.target.value)}
-            style={{ marginLeft: '5px' }}
-          >
-            <option value="">Select Y column</option>
-            {datacols?.map(col => (
-              <option key={col} value={col}>{col}</option>
-            ))}
-          </select>
-        </label>
-         <label style={{ marginRight: '10px', marginLeft: '15px' }}>
-          Title:
-        <input type="text" placeholder='Enter the title here' onChange={(e)=>setTitle(e.target.value)}/>
-          </label>
+      {/* Selection Form */}
+      <div className="selection-form">
+        <div className="form-row">
+          <div className="form-group">
+            <label>X Column:</label>
+            <select 
+              className="form-select"
+              value={selectedX} 
+              onChange={(e) => setSelectedX(e.target.value)}
+            >
+              <option value="">Select X column</option>
+              {datacols?.map(col => (
+                <option key={col} value={col}>{col}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="form-group">
+            <label>Y Column:</label>
+            <select 
+              className="form-select"
+              value={selectedY} 
+              onChange={(e) => setSelectedY(e.target.value)}
+            >
+              <option value="">Select Y column</option>
+              {datacols?.map(col => (
+                <option key={col} value={col}>{col}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="form-group">
+            <label>Chart Title:</label>
+            <input 
+              type="text" 
+              className="form-input"
+              placeholder="Enter chart title" 
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
 
-        <label style={{ marginRight: '10px', marginLeft: '15px' }}>
-          Single Column (for pie chart):
-          <select 
-            value={selectedColumn} 
-            onChange={(e) => setSelectedColumn(e.target.value)}
-            style={{ marginLeft: '5px' }}
-          >
-            <option value="">Select column</option>
-            {datacols?.map(col => (
-              <option key={col} value={col}>{col}</option>
-            ))}
-          </select>
-        </label>
+          <div className="form-group">
+            <label>Single Column (for pie/box/histogram):</label>
+            <select 
+              className="form-select"
+              value={selectedColumn} 
+              onChange={(e) => setSelectedColumn(e.target.value)}
+            >
+              <option value="">Select column</option>
+              {datacols?.map(col => (
+                <option key={col} value={col}>{col}</option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
       
       {/* Error Message */}
       {error && (
-        <div style={{ color: 'red', marginBottom: '10px' }}>
+        <div className="error-message">
           {error}
         </div>
       )}
       
       {/* Plot Buttons */}
-      <div style={{ marginBottom: '20px' }}>
-        <button 
-          onClick={() => handlePlotGeneration('lineplot')}
-          disabled={loading}
-          style={{ marginRight: '10px' }}
-        >
-          Line Plot
-        </button>
-        
-        <button 
-          onClick={() => handlePlotGeneration('barplot')}
-          disabled={loading}
-          style={{ marginRight: '10px' }}
-        >
-          Bar Plot
-        </button>
-        
-        <button 
-          onClick={() => handlePlotGeneration('scatterplot')}
-          disabled={loading}
-          style={{ marginRight: '10px' }}
-        >
-          Scatter Plot
-        </button>
-        
-        <button 
-          onClick={() => handlePlotGeneration('piechart')}
-          disabled={loading}
-          style={{ marginRight: '10px' }}
-        >
-          Pie Chart
-        </button>
-        
-        <button 
-          onClick={() => handlePlotGeneration('heatmap')}
-          disabled={loading}
-          style={{ marginRight: '10px' }}
-        >
-          Heatmap
-        </button>
-
-        <button 
-          onClick={() => handlePlotGeneration('boxplot')}
-          disabled={loading}
-          style={{ marginRight: '10px' }}
-        >
-          Box Plot
-        </button>
-
-        <button 
-          onClick={() => handlePlotGeneration('histogram')}
-          disabled={loading}
-          style={{ marginRight: '10px' }}
-        >
-          Histogram
-        </button>
-
-        <button 
-          onClick={() => handlePlotGeneration('pairplot')}
-          disabled={loading}
-          style={{ marginRight: '10px' }}
-        >
-          Pair Plot
-        </button>
-        
+      <div className="plot-buttons">
+        {plotButtons.map((button) => (
+          <button
+            key={button.type}
+            className="plot-button"
+            data-type={button.type}
+            onClick={() => handlePlotGeneration(button.type)}
+            disabled={loading}
+          >
+            <span className="plot-icon"></span>
+            {button.label}
+          </button>
+        ))}
       </div>
       
-      {/* Display Plot */}
-      {plotImage && (
-        <div>
-          {
-            loading?
-            'Generating...'
-            :
-            <img 
-            src={plotImage} 
-            alt="Generated Plot" 
-            style={{ maxWidth: '100%', border: '1px solid #ccc' }} 
-            />
-          }
-          <br />
-          <button onClick={downloadPlot} style={{ marginTop: '10px' }}>
-            Download Plot
-          </button>
+      {/* Plot Display */}
+      {plotImage ? (
+        <div className="plot-display">
+          {loading ? (
+            <div className="loading-state">
+              <div className="loading-spinner"></div>
+              Generating visualization...
+            </div>
+          ) : (
+            <>
+              <img 
+                src={plotImage} 
+                alt="Generated Plot" 
+                className="plot-image"
+              />
+              <br />
+              <button className="download-btn" onClick={downloadPlot}>
+                <span>💾</span>
+                Download Plot
+              </button>
+            </>
+          )}
         </div>
+      ) : (
+        !loading && (
+          <div className="plot-empty-state">
+            <div className="empty-icon">📊</div>
+            <h3>No Visualization Generated</h3>
+            <p>Select your data and choose a plot type to generate visualization</p>
+          </div>
+        )
       )}
     </div>
   );

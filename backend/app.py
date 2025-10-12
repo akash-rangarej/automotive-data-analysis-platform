@@ -163,11 +163,15 @@ def generate_plot():
         elif plot_function == 'boxplot':
             if not column:
                 return jsonify({'error': 'Column is required for box plot'}), 400
+            if uploaded_data[column].dtype not in ["int64","float64"]:
+                return jsonify({"error":"the provided column is not an numerical data"}), 400
             image_b64 = boxplot(uploaded_data, column,title)
 
         elif plot_function == 'histogram':
             if not column:
                 return jsonify({'error': 'Column is required for histogram'}), 400
+            if uploaded_data[column].dtype not in ["int64","float64"]:
+                return jsonify({"error":"the provided column is not an numerical data"}), 400
             image_b64 = histogram(uploaded_data, column,title)
         
         elif plot_function == 'heatmap':
