@@ -12,7 +12,7 @@ function GetInfo() {
     setError(null);
     setCurrentAnalysis(analysisType);
     try {
-      const response = await fetch(`http://localhost:5000/${analysisType}`);
+      const response = await fetch(`/${analysisType}`);
       
       const data = await response.json();
       
