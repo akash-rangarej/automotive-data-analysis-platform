@@ -75,7 +75,6 @@ function App() {
             </div>
             <div className="user-info">
               <span className="user-name">Welcome User</span>
-              <span className="user-status">Premium</span>
             </div>
           </div>
         </nav>
@@ -86,14 +85,6 @@ function App() {
             <h2>
               {navItems.find(item => item.key === currentComponent)?.label}
             </h2>
-            <div className="header-actions">
-              <button className="action-btn">
-                <span>🔔</span>
-              </button>
-              <button className="action-btn">
-                <span>⚙️</span>
-              </button>
-            </div>
           </div>
 
           <div className="content-area">
