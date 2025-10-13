@@ -3,6 +3,7 @@ import FileUpload from "./components/FileUpload.jsx";
 import GetInfo from "./components/GetInfo.jsx";
 import Visualize from "./components/Visualize.jsx";
 import GetProcessedData from "./components/GetProcessedData.jsx";
+import About from "./components/About.jsx";
 import "./App.css";
 
 function App() {
@@ -13,7 +14,8 @@ function App() {
     { key: "upload", label: "Upload File", icon: "📁" },
     { key: "info", label: "Get Info", icon: "ℹ️" },
     { key: "visualize", label: "Visualize", icon: "📊" },
-    { key: "processed", label: "Processed Data", icon: "⚡" }
+    { key: "processed", label: "Processed Data", icon: "⚡" },
+    { key: "about", label: "About", icon: "❓" }
   ];
 
   const renderComponent = () => {
@@ -22,6 +24,7 @@ function App() {
       case "info": return <GetInfo />;
       case "visualize": return <Visualize />;
       case "processed": return <GetProcessedData />;
+       case "about": return <About />;
       default: return <FileUpload />;
     }
   };
@@ -50,7 +53,7 @@ function App() {
 
       <div className="app-body">
         {/* Sidebar Navigation */}
-        <nav className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+        <nav className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
           <div className="nav-items">
             {navItems.map((item) => (
               <button
@@ -85,10 +88,20 @@ function App() {
             <h2>
               {navItems.find(item => item.key === currentComponent)?.label}
             </h2>
+            {currentComponent === "upload" && (
+              <div className="file-format-note">
+                <div className="note-icon">💡</div>
+                <div className="note-content">
+                  <strong>Supported Formats:</strong> Please use datasets in <strong>.csv files (recommended)</strong> or <strong>.xlsx (latest Excel format)</strong> for optimal performance.
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="content-area">
-            {renderComponent()}
+            <div className="responsive-container">
+              {renderComponent()}
+            </div>
           </div>
         </main>
       </div>

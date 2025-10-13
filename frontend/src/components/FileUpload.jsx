@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import './FileUpload.css';
+import './FileUpload.css'; // make sure this matches your css filename
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
@@ -22,7 +22,7 @@ const FileUpload = () => {
       // Check file type
       const fileExtension = selectedFile.name.split('.').pop().toLowerCase();
       const allowedTypes = ['csv', 'xlsx', 'xls'];
-      
+
       if (allowedTypes.includes(fileExtension)) {
         setFile(selectedFile);
         setMessage(`Selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(2)} KB)`);
@@ -66,7 +66,7 @@ const FileUpload = () => {
 
     try {
       const xhr = new XMLHttpRequest();
-      
+
       xhr.upload.addEventListener('progress', (e) => {
         if (e.lengthComputable) {
           const percentComplete = (e.loaded / e.total) * 100;
@@ -76,24 +76,22 @@ const FileUpload = () => {
 
       const response = await new Promise((resolve, reject) => {
         xhr.open('POST', '/upload_file');
-        
+
         xhr.onload = () => {
           if (xhr.status === 200) {
             try {
               const responseText = xhr.responseText;
-              // More robust JSON parsing with error handling
               const parsedResponse = JSON.parse(responseText);
               resolve(parsedResponse);
             } catch (parseError) {
               console.error('JSON Parse Error:', parseError);
-              // Try to get at least the error message
               reject(new Error('Invalid server response format'));
             }
           } else {
             reject(new Error(`Server error: ${xhr.status}`));
           }
         };
-        
+
         xhr.onerror = () => reject(new Error('Network error - cannot connect to server'));
         xhr.send(formData);
       });
@@ -108,10 +106,9 @@ const FileUpload = () => {
       } else {
         setMessage(`❌ ${response.message || 'Upload failed'}`);
       }
-      
     } catch (error) {
       console.error('Upload error:', error);
-      setMessage(`❌ Error: ${error.message || 'Upload failed'}`);
+      setMessage(`❌ ${error.message || 'Upload failed'}`);
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -132,18 +129,17 @@ const FileUpload = () => {
     if (value === null || value === undefined || value === '') {
       return 'NULL';
     }
-    // Handle other special cases
     if (typeof value === 'number' && (isNaN(value) || !isFinite(value))) {
       return 'NULL';
     }
-    return value.toString();
+    return String(value);
   };
 
   return (
     <div className="advanced-upload-container">
       <h2>📁 Upload Data File</h2>
-      
-      <div 
+
+      <div
         className={`drop-zone ${file ? 'has-file' : ''}`}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
@@ -175,15 +171,15 @@ const FileUpload = () => {
       </div>
 
       <div className="upload-controls">
-        <button 
-          onClick={handleUpload} 
+        <button
+          onClick={handleUpload}
           disabled={uploading || !file}
           className="upload-btn"
         >
           {uploading ? `Uploading... ${Math.round(uploadProgress)}%` : 'Upload File'}
         </button>
-        
-        <button 
+
+        <button
           onClick={resetForm}
           className="reset-btn"
         >
@@ -193,8 +189,8 @@ const FileUpload = () => {
 
       {uploading && uploadProgress > 0 && (
         <div className="progress-bar-container">
-          <div 
-            className="progress-bar" 
+          <div
+            className="progress-bar"
             style={{ width: `${uploadProgress}%` }}
           ></div>
         </div>
@@ -216,9 +212,9 @@ const FileUpload = () => {
               <span>Contains: {Object.values(data.null_counts).filter(count => count > 0).length} columns with NULL values</span>
             )}
           </div>
-          
+
           {data.preview?.first_few_rows && (
-            <div className="table-wrapper">
+            <div className="table-wrapper data-preview-container">
               <table>
                 <thead>
                   <tr>

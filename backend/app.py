@@ -6,7 +6,8 @@ from flask_cors import CORS
 import io
 import numpy as np
 import os
-
+import openpyxl
+import xlrd
 app = Flask(__name__, static_folder='../frontend/dist', static_url_path='')
 CORS(app)
 
@@ -58,8 +59,34 @@ def upload_file():
             df = pd.read_csv(file, na_values=['', 'NULL', 'null', 'NaN', 'N/A'])
             message = 'CSV file uploaded successfully'
         elif file_extension in ['xlsx', 'xls']:
-            df = pd.read_excel(file)
-            message = 'Excel file uploaded successfully'
+            # Save the file temporarily to read with specific engines
+            temp_path = f"temp_{filename}"
+            file.save(temp_path)
+            
+            try:
+                if file_extension == 'xlsx':
+                    # Use openpyxl for .xlsx files
+                    df = pd.read_excel(temp_path, engine='openpyxl', na_values=['', 'NULL', 'null', 'NaN', 'N/A'])
+                else:  # .xls files
+                    # Use xlrd for .xls files
+                    df = pd.read_excel(temp_path, engine='xlrd', na_values=['', 'NULL', 'null', 'NaN', 'N/A'])
+                message = 'Excel file uploaded successfully'
+            except Exception as excel_error:
+                # Fallback to default engine if specific engines fail
+                try:
+                    df = pd.read_excel(temp_path, na_values=['', 'NULL', 'null', 'NaN', 'N/A'])
+                    message = 'Excel file uploaded successfully (using default engine)'
+                except Exception as fallback_error:
+                    return jsonify({
+                        'success': False, 
+                        'data': None, 
+                        'message': f'Error reading Excel file: {str(excel_error)}. Fallback also failed: {str(fallback_error)}'
+                    })
+            finally:
+                # Clean up temporary file
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+                    
         else:
             return jsonify({'success': False, 'data': None, 'message': 'Invalid file type. Please upload CSV or Excel files.'})
         
@@ -84,12 +111,10 @@ def upload_file():
             'columns': df_cleaned.columns.tolist()
         }
 
-        # Now you can use jsonify directly since we set the custom encoder
         return jsonify(response_data)
         
     except Exception as e:
-        return jsonify({'success': False, 'data': None, 'message': f'Error reading file: {str(e)}'})
-    
+        return jsonify({'success': False, 'data': None, 'message': f'Error reading file: {str(e)}'})    
 
 # Get info section
 @app.route("/get_nulls", methods=['GET'])

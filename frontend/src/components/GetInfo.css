@@ -17,6 +17,14 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.analysis-buttons-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .analysis-buttons {
@@ -102,6 +110,108 @@
   border-radius: var(--border-radius);
   padding: 1.5rem;
   box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Table Container with Scroll */
+.analysis-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1rem 0;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Custom scrollbar for table containers */
+.analysis-table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.analysis-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.analysis-table-wrapper::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+.analysis-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+/* Outliers table container - specific styling */
+.outliers-table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1rem 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.outliers-table-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.outliers-table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.outliers-table-container::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+/* Tables */
+.analysis-table {
+  width: auto;
+  min-width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  margin: 0;
+  table-layout: fixed;
+}
+
+.analysis-table th {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+}
+
+.analysis-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.analysis-table tr:last-child td {
+  border-bottom: none;
+}
+
+.analysis-table tr:hover td {
+  background: #f8fafc;
+  transition: var(--transition);
+}
+
+/* Value counts specific styles */
+.get_value_counts .analysis-table {
+  min-width: 100%;
+  width: auto;
 }
 
 .analysis-results h3 {
@@ -129,42 +239,6 @@
   margin: 1.5rem 0 0.75rem 0;
 }
 
-/* Tables */
-.analysis-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border-radius: var(--border-radius);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  margin: 1rem 0;
-}
-
-.analysis-table th {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-  color: white;
-  padding: 1rem;
-  text-align: left;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.analysis-table td {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
-.analysis-table tr:last-child td {
-  border-bottom: none;
-}
-
-.analysis-table tr:hover td {
-  background: #f8fafc;
-  transition: var(--transition);
-}
-
 /* No Data State */
 .no-data-message {
   text-align: center;
@@ -176,7 +250,14 @@
   margin: 1rem 0;
 }
 
-/* Responsive Design */
+/* Mobile-First Responsive Design */
+@media (max-width: 1200px) {
+  .analysis-table {
+    table-layout: auto;
+    width: max-content;
+  }
+}
+
 @media (max-width: 768px) {
   .analysis-buttons {
     flex-direction: column;
@@ -185,23 +266,56 @@
   .analysis-btn {
     justify-content: center;
     padding: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .analysis-results {
+    padding: 1rem;
+    max-width: 100%;
   }
   
   .analysis-table {
     font-size: 0.8rem;
+    min-width: 600px; /* Ensure tables have minimum width for scrolling */
   }
   
   .analysis-table th,
   .analysis-table td {
     padding: 0.75rem 0.5rem;
+    min-width: 100px; /* Ensure cells don't get too narrow */
   }
   
-  .analysis-results {
-    padding: 1rem;
+  .analysis-table-wrapper,
+  .outliers-table-container {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: #f8f9fa;
+  }
+  
+  /* Scroll indicator for mobile */
+  .analysis-table-wrapper::after,
+  .outliers-table-container::after {
+    content: "← Scroll →";
+    display: block;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-light);
+    padding: 0.5rem;
+    background: linear-gradient(90deg, transparent, #e9ecef, transparent);
+  }
+  
+  .info-container {
+    max-width: 100%;
+    overflow-x: hidden;
   }
 }
 
 @media (max-width: 480px) {
+  .get-info {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  
   .get-info h2 {
     font-size: 1.5rem;
   }
@@ -210,9 +324,64 @@
     font-size: 1.1rem;
   }
   
+  .analysis-results {
+    padding: 0.75rem;
+  }
+  
   .analysis-table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
+    min-width: 500px;
+    font-size: 0.75rem;
+  }
+  
+  .analysis-table th,
+  .analysis-table td {
+    padding: 0.5rem 0.25rem;
+    min-width: 80px;
+  }
+  
+  .analysis-btn {
+    font-size: 0.85rem;
+    padding: 0.875rem;
+  }
+  
+  /* Hide scroll indicator on very small screens if not needed */
+  .analysis-table-wrapper:not(:-webkit-scrollbar-thumb),
+  .outliers-table-container:not(:-webkit-scrollbar-thumb) {
+    border: 1px solid var(--border-color);
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+  .analysis-table {
+    min-width: 400px;
+  }
+  
+  .analysis-table th,
+  .analysis-table td {
+    padding: 0.4rem 0.2rem;
+    font-size: 0.7rem;
+    min-width: 70px;
+  }
+  
+  .analysis-results h3 {
+    font-size: 1rem;
+  }
+  
+  .analysis-results h4 {
+    font-size: 0.9rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  .analysis-table-wrapper,
+  .outliers-table-container {
+    overflow-x: visible !important;
+  }
+  
+  .analysis-table {
+    width: 100% !important;
+    min-width: 100% !important;
   }
 }
