@@ -144,12 +144,16 @@ def get_value_counts_analysis():
     value_counts_info = get_value_counts(uploaded_data)
     return jsonify({'data': value_counts_info})
 
+
+
 @app.route('/get_columns', methods=['GET'])
 def get_columns():
     global uploaded_data
     if uploaded_data is None:
         return jsonify({'columns': []})
     return jsonify({'columns': uploaded_data.columns.tolist()})
+
+
 
 @app.route('/generate_plot', methods=['POST','GET'])
 def generate_plot():
@@ -176,44 +180,146 @@ def generate_plot():
         if plot_function == 'lineplot':
             if not x or not y:
                 return jsonify({'error': 'Both x and y columns are required for line plot'}), 400
-            image_b64 = lineplot(uploaded_data, x, y,title)
+            
+            if not pd.api.types.is_numeric_dtype(uploaded_data[y]):
+                return jsonify({'error': 'Y-axis must be numerical for line plot'}), 400
+            
+            if uploaded_data[[x, y]].dropna().shape[0] < 2:
+                return jsonify({
+                    'error': 'Insufficient data for line plot. Need at least 2 valid data points'
+                }), 400
+            if uploaded_data[x].dtype == 'O' and uploaded_data[x].nunique() > 20:
+                return jsonify({
+                    'error': f'{x} column has too many values for line plot'
+                }), 400
+            image_b64 = lineplot(uploaded_data, x, y, title)
         
         elif plot_function == 'barplot':
             if not x or not y:
                 return jsonify({'error': 'Both x and y columns are required for bar plot'}), 400
-            image_b64 = barplot(uploaded_data, x, y,title)
+            
+            if not pd.api.types.is_numeric_dtype(uploaded_data[y]):
+                return jsonify({'error': 'Y-axis must be numerical for bar plot'}), 400
+            if uploaded_data[x].dtype == 'O' and uploaded_data[x].nunique() > 20:
+                return jsonify({
+                    'error': f'{x} column has too many values for bar plot'
+                }), 400
+            # Check for reasonable number of categories
+            category_count = uploaded_data[x].nunique()
+            if category_count > 30:
+                return jsonify({
+                    'error': f'Bar plot would have too many bars ({category_count}). Consider using a different plot type or aggregating your data.'
+                }), 400
+            
+            # Basic data check
+            if uploaded_data[[x, y]].dropna().empty:
+                return jsonify({
+                    'error': 'No valid data available for bar plot'
+                }), 400
+            
+            image_b64 = barplot(uploaded_data, x, y, title)
         
         elif plot_function == 'scatterplot':
             if not x or not y:
                 return jsonify({'error': 'Both x and y columns are required for scatter plot'}), 400
+            if not (pd.api.types.is_numeric_dtype(uploaded_data[x]) and pd.api.types.is_numeric_dtype(uploaded_data[y])):
+                return jsonify({'error': 'Both x and y columns should be numerical for scatter plot'}), 400
+            clean_data = uploaded_data[[x, y]].dropna()
+            if len(clean_data) < 3:
+                return jsonify({
+                    'error': 'Need at least 3 valid data points for meaningful scatter plot'
+                }), 400
             image_b64 = scatterplot(uploaded_data, x, y,title)
         
         elif plot_function == 'piechart':
             if not column:
                 return jsonify({'error': 'Column is required for pie chart'}), 400
-            if uploaded_data[column].dtype != "O":
-                return jsonify({"error":"the provided column is not an categorical data"}), 400
+            # Simple but robust check
+            if (not pd.api.types.is_string_dtype(uploaded_data[column]) and not pd.api.types.is_categorical_dtype(uploaded_data[column]) and not pd.api.types.is_object_dtype(uploaded_data[column])):
+    
+                return jsonify({
+                'error': f"Column '{column}' must be categorical data (text-based) for pie charts. Current type: {uploaded_data[column].dtype}"
+                    }), 400
+            # Check category count
+            if uploaded_data[column].nunique() > 20:
+                return jsonify({
+                    'error': f"Pie charts work best with limited categories. Column '{column}' has {uploaded_data[column].nunique()} unique values. Maximum 20 values are allowed"
+                }), 400
             image_b64 = piechart(uploaded_data, column,title)
 
         elif plot_function == 'boxplot':
             if not column:
                 return jsonify({'error': 'Column is required for box plot'}), 400
-            if uploaded_data[column].dtype not in ["int64","float64"]:
-                return jsonify({"error":"the provided column is not an numerical data"}), 400
+            def validate_boxplot_data(series):
+                """Validate if series is suitable for box plot"""                
+                # Check if numeric
+                if not pd.api.types.is_numeric_dtype(series):
+                    return False, f"Data must be numerical for box plots. Current type: {series.dtype}"                
+                # Check for sufficient data points (box plots need reasonable sample size)
+                non_null_count = series.count()
+                if non_null_count < 5:
+                    return False, f"Insufficient data points ({non_null_count}) for box plot. Minimum 5 non-null values required."                
+                # Check if there's meaningful variation (not all same values)
+                if series.nunique() <= 1:
+                    return False, "Data has no variation (all values are identical). Box plot requires meaningful data distribution."                
+                return True, "Valid"
+            is_valid, message = validate_boxplot_data(uploaded_data[column])
+            if not is_valid:
+                return jsonify({'error': message}), 400
             image_b64 = boxplot(uploaded_data, column,title)
 
         elif plot_function == 'histogram':
             if not column:
                 return jsonify({'error': 'Column is required for histogram'}), 400
-            if uploaded_data[column].dtype not in ["int64","float64"]:
-                return jsonify({"error":"the provided column is not an numerical data"}), 400
+            def validate_histogram_data(series):
+                """Validate if series is suitable for histogram"""                
+                # Check if numeric
+                if not pd.api.types.is_numeric_dtype(series):
+                    return False, f"Data must be numerical for histograms. Current type: {series.dtype}"                
+                # Check for sufficient data points
+                non_null_count = series.count()
+                if non_null_count < 5:
+                    return False, f"Insufficient data points ({non_null_count}) for histogram. Minimum 5 non-null values required."                
+                # Check if there's meaningful variation
+                if series.nunique() <= 1:
+                    return False, "Data has no variation (all values are identical). Histogram requires meaningful data distribution."                
+                # Check if data has enough spread for meaningful bins
+                data_range = series.max() - series.min()
+                if data_range == 0:
+                    return False, "Data has no range (all values are the same). Cannot create meaningful histogram."                
+                return True, "Valid"
+            
+            is_valid, message = validate_histogram_data(uploaded_data[column])
+            if not is_valid:
+                return jsonify({'error': message}), 400
             image_b64 = histogram(uploaded_data, column,title)
-        
+
         elif plot_function == 'heatmap':
+            def validate_heatmap_data(df):
+                # Check we have at least 2 columns
+                num_cols = df.select_dtypes(include=np.number).columns.tolist()
+                if len(num_cols) < 2:
+                    return False, "Heatmap requires at least 2 numerical columns"
+                    # check if all numerical columns are not having non-null values
+                if uploaded_data[num_cols].dropna().empty:
+                    return False,"numerical columns have no valid data for heatmap"
+                return True ,"valid"
+            is_valid, message = validate_heatmap_data(uploaded_data)
+            if not is_valid:
+                return jsonify({'error': message}), 400
             image_b64 = heatmap(uploaded_data,title)
 
         elif plot_function == 'pairplot':
-            image_b64 = pairplot(uploaded_data,title)
+            numeric_cols = uploaded_data.select_dtypes(include=np.number).columns.tolist()
+            if len(numeric_cols) == 0:
+                  return jsonify({
+                    'error': "No numerical columns are available in this dataset"
+                }), 400
+            if len(numeric_cols) < 2:
+                return jsonify({
+                    'error': "Pairplot requires at least 2 numerical columns in the dataset"
+                }), 400
+            image_b64 = pairplot(uploaded_data, title)
 
         
         else:

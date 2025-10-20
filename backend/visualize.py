@@ -19,7 +19,7 @@ def plot_to_base64(plt):
 def lineplot(df, x, y,title):
     plt.figure(figsize=(10, 6))
     sns.lineplot(data=df, x=x, y=y)
-    plt.title(title)
+    plt.title(title, fontweight='bold')
     plt.xticks(rotation=45)
     plt.tight_layout()
     return plot_to_base64(plt)
@@ -27,7 +27,7 @@ def lineplot(df, x, y,title):
 def barplot(df, x, y,title):
     plt.figure(figsize=(10, 6))
     sns.barplot(data=df, x=x, y=y)
-    plt.title(title)
+    plt.title(title, fontweight='bold')
     plt.xticks(rotation=45)
     plt.tight_layout()
     return plot_to_base64(plt)
@@ -35,14 +35,14 @@ def barplot(df, x, y,title):
 def scatterplot(df, x, y,title):
     plt.figure(figsize=(10, 6))
     sns.scatterplot(data=df, x=x, y=y)
-    plt.title(title)
+    plt.title(title, fontweight='bold')
     plt.tight_layout()
     return plot_to_base64(plt)
 
 def piechart(df, column,title):
     plt.figure(figsize=(8, 8))
     df[column].value_counts().plot.pie(autopct='%1.1f%%')
-    plt.title(title)
+    plt.title(title, fontweight='bold')
     plt.ylabel('')  # Remove y-label
     plt.tight_layout()
     return plot_to_base64(plt)
@@ -52,7 +52,7 @@ def heatmap(df,title):
     numeric_df = df.select_dtypes(include=['number'])
     if numeric_df.shape[1] > 1:  # Only plot if we have at least 2 numeric columns
         sns.heatmap(numeric_df.corr(), annot=True, cmap='coolwarm', fmt='.2f')
-        plt.title(title)
+        plt.title(title, fontweight='bold')
     else:
         plt.text(0.5, 0.5, 'Not enough numeric columns for heatmap', 
                 ha='center', va='center', transform=plt.gca().transAxes)
@@ -65,7 +65,7 @@ def boxplot(df, column, title):
         if pd.api.types.is_numeric_dtype(df[column]):
             plt.figure(figsize=(10, 6))
             sns.boxplot(data=df, y=column)
-            plt.title(title)
+            plt.title(title, fontweight='bold')
             plt.tight_layout()
             return plot_to_base64(plt)
         return "Error: Please select a numerical column for boxplot visualization"
@@ -77,7 +77,7 @@ def histogram(df, column, title):
         if pd.api.types.is_numeric_dtype(df[column]):
             plt.figure(figsize=(10, 6))
             sns.histplot(data=df, x=column, kde=True)
-            plt.title(title)
+            plt.title(title, fontweight='bold')
             plt.tight_layout()
             return plot_to_base64(plt)
         return "Error: Please select a numerical column for histogram visualization"
