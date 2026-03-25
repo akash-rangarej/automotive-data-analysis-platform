@@ -15,7 +15,7 @@ const Visualize = () => {
   useEffect(() => {
     const fetchColumns = async () => {
       try {
-        const response = await fetch(' /get_columns');
+        const response = await fetch(' http://127.0.0.1:5000/get_columns');
         const Data = await response.json();
         setDatacols(Data.columns || []);
       } catch (error) {
@@ -53,7 +53,7 @@ const Visualize = () => {
         requestBody.column = selectedColumn;
       }
       
-      const response = await fetch(' /generate_plot', {
+      const response = await fetch(' http://127.0.0.1:5000/generate_plot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),

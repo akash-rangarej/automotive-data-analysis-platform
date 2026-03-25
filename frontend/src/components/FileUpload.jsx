@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react';
-import './FileUpload.css'; // make sure this matches your css filename
+import React, { useState, useRef } from "react";
+import "./FileUpload.css"; // make sure this matches your css filename
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [data, setData] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
@@ -14,21 +14,23 @@ const FileUpload = () => {
     if (selectedFile) {
       // Check file size (max 10MB)
       if (selectedFile.size > 10 * 1024 * 1024) {
-        setMessage('File size too large. Maximum size is 10MB.');
+        setMessage("File size too large. Maximum size is 10MB.");
         setFile(null);
         return;
       }
 
       // Check file type
-      const fileExtension = selectedFile.name.split('.').pop().toLowerCase();
-      const allowedTypes = ['csv', 'xlsx', 'xls'];
+      const fileExtension = selectedFile.name.split(".").pop().toLowerCase();
+      const allowedTypes = ["csv", "xlsx", "xls"];
 
       if (allowedTypes.includes(fileExtension)) {
         setFile(selectedFile);
-        setMessage(`Selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(2)} KB)`);
+        setMessage(
+          `Selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(2)} KB)`,
+        );
         setData(null);
       } else {
-        setMessage('Please select a CSV or Excel file ( .csv, .xlsx, .xls )');
+        setMessage("Please select a CSV or Excel file ( .csv, .xlsx, .xls )");
         setFile(null);
       }
     }
@@ -53,21 +55,21 @@ const FileUpload = () => {
 
   const handleUpload = async () => {
     if (!file) {
-      setMessage('Please select a file first');
+      setMessage("Please select a file first");
       return;
     }
 
     setUploading(true);
-    setMessage('');
+    setMessage("");
     setUploadProgress(0);
 
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
 
     try {
       const xhr = new XMLHttpRequest();
 
-      xhr.upload.addEventListener('progress', (e) => {
+      xhr.upload.addEventListener("progress", (e) => {
         if (e.lengthComputable) {
           const percentComplete = (e.loaded / e.total) * 100;
           setUploadProgress(percentComplete);
@@ -75,7 +77,7 @@ const FileUpload = () => {
       });
 
       const response = await new Promise((resolve, reject) => {
-        xhr.open('POST', ' /upload_file');
+        xhr.open("POST", "http://127.0.0.1:5000/upload_file");
 
         xhr.onload = () => {
           if (xhr.status === 200) {
@@ -84,31 +86,32 @@ const FileUpload = () => {
               const parsedResponse = JSON.parse(responseText);
               resolve(parsedResponse);
             } catch (parseError) {
-              console.error('JSON Parse Error:', parseError);
-              reject(new Error('Invalid server response format'));
+              console.error("JSON Parse Error:", parseError);
+              reject(new Error("Invalid server response format"));
             }
           } else {
             reject(new Error(`Server error: ${xhr.status}`));
           }
         };
 
-        xhr.onerror = () => reject(new Error('Network error - cannot connect to server'));
+        xhr.onerror = () =>
+          reject(new Error("Network error - cannot connect to server"));
         xhr.send(formData);
       });
 
       if (response.success) {
         setData(response);
-        setMessage(`✅ ${response.message || 'File uploaded successfully!'}`);
+        setMessage(`✅ ${response.message || "File uploaded successfully!"}`);
         setFile(null);
         if (fileInputRef.current) {
-          fileInputRef.current.value = '';
+          fileInputRef.current.value = "";
         }
       } else {
-        setMessage(`❌ ${response.message || 'Upload failed'}`);
+        setMessage(`❌ ${response.message || "Upload failed"}`);
       }
     } catch (error) {
-      console.error('Upload error:', error);
-      setMessage(`❌ ${error.message || 'Upload failed'}`);
+      console.error("Upload error:", error);
+      setMessage(`❌ ${error.message || "Upload failed"}`);
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -118,19 +121,19 @@ const FileUpload = () => {
   const resetForm = () => {
     setFile(null);
     setData(null);
-    setMessage('');
+    setMessage("");
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
   // Helper function to safely display cell values
   const displayCellValue = (value) => {
-    if (value === null || value === undefined || value === '') {
-      return 'NULL';
+    if (value === null || value === undefined || value === "") {
+      return "NULL";
     }
-    if (typeof value === 'number' && (isNaN(value) || !isFinite(value))) {
-      return 'NULL';
+    if (typeof value === "number" && (isNaN(value) || !isFinite(value))) {
+      return "NULL";
     }
     return String(value);
   };
@@ -140,11 +143,11 @@ const FileUpload = () => {
       <h2>📁 Upload Data File</h2>
 
       <div
-        className={`drop-zone ${file ? 'has-file' : ''}`}
+        className={`drop-zone ${file ? "has-file" : ""}`}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
         onClick={handleDropZoneClick}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: "pointer" }}
       >
         <input
           ref={fileInputRef}
@@ -153,7 +156,7 @@ const FileUpload = () => {
           onChange={handleFileChange}
           className="file-input"
           id="advancedFileInput"
-          style={{ display: 'none' }}
+          style={{ display: "none" }}
         />
         <div className="drop-zone-content">
           {file ? (
@@ -176,13 +179,12 @@ const FileUpload = () => {
           disabled={uploading || !file}
           className="upload-btn"
         >
-          {uploading ? `Uploading... ${Math.round(uploadProgress)}%` : 'Upload File'}
+          {uploading
+            ? `Uploading... ${Math.round(uploadProgress)}%`
+            : "Upload File"}
         </button>
 
-        <button
-          onClick={resetForm}
-          className="reset-btn"
-        >
+        <button onClick={resetForm} className="reset-btn">
           Reset
         </button>
       </div>
@@ -197,7 +199,9 @@ const FileUpload = () => {
       )}
 
       {message && (
-        <div className={`message ${data ? 'success' : file ? 'info' : 'error'}`}>
+        <div
+          className={`message ${data ? "success" : file ? "info" : "error"}`}
+        >
           {message}
         </div>
       )}
@@ -206,10 +210,21 @@ const FileUpload = () => {
         <div className="data-preview">
           <h3>📊 Data Preview</h3>
           <div className="stats">
-            <span>Rows: {data.shape ? data.shape[0] : data.preview?.shape[0]}</span>
-            <span>Columns: {data.shape ? data.shape[1] : data.preview?.shape[1]}</span>
+            <span>
+              Rows: {data.shape ? data.shape[0] : data.preview?.shape[0]}
+            </span>
+            <span>
+              Columns: {data.shape ? data.shape[1] : data.preview?.shape[1]}
+            </span>
             {data.null_counts && (
-              <span>Contains: {Object.values(data.null_counts).filter(count => count > 0).length} columns with NULL values</span>
+              <span>
+                Contains:{" "}
+                {
+                  Object.values(data.null_counts).filter((count) => count > 0)
+                    .length
+                }{" "}
+                columns with NULL values
+              </span>
             )}
           </div>
 
@@ -224,15 +239,17 @@ const FileUpload = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.preview.first_few_rows.slice(0, 5).map((row, rowIndex) => (
-                    <tr key={rowIndex}>
-                      {data.preview.columns.map((column, colIndex) => (
-                        <td key={colIndex}>
-                          {displayCellValue(row[column])}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
+                  {data.preview.first_few_rows
+                    .slice(0, 5)
+                    .map((row, rowIndex) => (
+                      <tr key={rowIndex}>
+                        {data.preview.columns.map((column, colIndex) => (
+                          <td key={colIndex}>
+                            {displayCellValue(row[column])}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
                 </tbody>
               </table>
               <p className="preview-note">Showing first 5 rows</p>

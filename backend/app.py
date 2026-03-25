@@ -145,6 +145,13 @@ def get_value_counts_analysis():
     return jsonify({'data': value_counts_info})
 
 
+@app.route("/get_categories", methods=['GET'])
+def get_categories_analysis():
+    global uploaded_data
+    if uploaded_data is None:
+            return jsonify({'error': 'No dataset uploaded. Please upload a dataset first.'}), 400
+    from get_info import get_categories
+
 
 @app.route('/get_columns', methods=['GET'])
 def get_columns():

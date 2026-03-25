@@ -56,3 +56,26 @@ def get_value_counts(df):
         })
     
     return results
+
+
+def get_categories(df):
+    if df is None:
+        return {"error": "No data loaded"}
+    int_feilds = set()
+    float_feilds = set()
+    str_feilds = set()
+    date_feilds = set()
+    bool_feilds = set()
+    for col in df.columns:
+        if df[col].dtype in {'int64','int32'}:
+            int_feilds.add(col)
+        if df[col].dtype in {'float64','float32'}:
+            float_feilds.add(col)
+        if df[col].dtype == "O":
+            str_feilds.add(col)
+        if df[col].dtype in {'datetime64[ns]', 'datetime64'}:
+            date_feilds.add(col)
+        if df[col].dtype == "bool":
+            bool_feilds.add(col)
+    return [int_feilds,float_feilds,str_feilds,date_feilds,bool_feilds]
+    
