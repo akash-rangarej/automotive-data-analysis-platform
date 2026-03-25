@@ -20,7 +20,7 @@ function GetProcessedData() {
     setSuccess("");
     
     try {
-      const response = await fetch(" http://127.0.0.1:5000/get_processed_data", {
+      const response = await fetch("/get_processed_data", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +75,7 @@ function GetProcessedData() {
     setSuccess("");
     
     try {
-      const response = await fetch(" http://127.0.0.1:5000/get_processed_data", {
+      const response = await fetch("/get_processed_data", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
