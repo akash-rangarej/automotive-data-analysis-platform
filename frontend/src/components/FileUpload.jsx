@@ -77,7 +77,7 @@ const FileUpload = () => {
       });
 
       const response = await new Promise((resolve, reject) => {
-        xhr.open('POST', '/upload_file');
+        xhr.open('POST', 'http://127.0.0.1:5000/upload_file');
 
         xhr.onload = () => {
           if (xhr.status === 200) {
