@@ -114,7 +114,7 @@ def upload_file():
         return jsonify(response_data)
         
     except Exception as e:
-        return jsonify({'success': False, 'data': None, 'message': f'Error reading file: {str(e)}'})    
+        return jsonify({'success': False, 'data': None, 'message': f'Error reading file: not suitable for data analysis'})    
 
 # Get info section
 @app.route("/get_nulls", methods=['GET'])
@@ -151,6 +151,16 @@ def get_categories_analysis():
     if uploaded_data is None:
             return jsonify({'error': 'No dataset uploaded. Please upload a dataset first.'}), 400
     from get_info import get_categories
+    categories_raw = get_categories(uploaded_data)
+    categories = {
+        'int_fields': sorted(list(categories_raw[0])),
+        'float_fields': sorted(list(categories_raw[1])),
+        'str_fields': sorted(list(categories_raw[2])),
+        'date_fields': sorted(list(categories_raw[3])),
+        'bool_fields': sorted(list(categories_raw[4]))
+    }
+    return jsonify({'data': categories})
+
 
 
 @app.route('/get_columns', methods=['GET'])

@@ -1,3 +1,6 @@
+import pandas as pd
+
+
 def get_nulls(df):
     if df is None:
         return {"error": "No data loaded"}
@@ -61,21 +64,26 @@ def get_value_counts(df):
 def get_categories(df):
     if df is None:
         return {"error": "No data loaded"}
-    int_feilds = set()
-    float_feilds = set()
-    str_feilds = set()
-    date_feilds = set()
-    bool_feilds = set()
+    int_fields = []
+    float_fields = []
+    str_fields = []
+    date_fields = []
+    bool_fields = []
+
     for col in df.columns:
-        if df[col].dtype in {'int64','int32'}:
-            int_feilds.add(col)
-        if df[col].dtype in {'float64','float32'}:
-            float_feilds.add(col)
-        if df[col].dtype == "O":
-            str_feilds.add(col)
-        if df[col].dtype in {'datetime64[ns]', 'datetime64'}:
-            date_feilds.add(col)
-        if df[col].dtype == "bool":
-            bool_feilds.add(col)
-    return [int_feilds,float_feilds,str_feilds,date_feilds,bool_feilds]
+        series = df[col]
+        # Use pandas type checks for robust detection
+        if pd.api.types.is_integer_dtype(series):
+            int_fields.append(col)
+        elif pd.api.types.is_float_dtype(series):
+            float_fields.append(col)
+        elif pd.api.types.is_bool_dtype(series):
+            bool_fields.append(col)
+        elif pd.api.types.is_datetime64_any_dtype(series):
+            date_fields.append(col)
+        else:
+            # Treat remaining types (object, category, string) as string-like
+            str_fields.append(col)
+
+    return [int_fields, float_fields, str_fields, date_fields, bool_fields]
     

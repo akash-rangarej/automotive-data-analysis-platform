@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import "./FileUpload.css"; // make sure this matches your css filename
+import "./FileUpload.css"; 
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
@@ -77,7 +77,7 @@ const FileUpload = () => {
       });
 
       const response = await new Promise((resolve, reject) => {
-        xhr.open('POST', 'http://127.0.0.1:5000/upload_file');
+        xhr.open('POST', '/upload_file');
 
         xhr.onload = () => {
           if (xhr.status === 200) {

@@ -12,7 +12,7 @@ function GetInfo() {
     setError(null);
     setCurrentAnalysis(analysisType);
     try {
-      const response = await fetch(`http://127.0.0.1:5000/${analysisType}`);
+      const response = await fetch(`/${analysisType}`);
 
       const data = await response.json();
 
@@ -31,7 +31,7 @@ function GetInfo() {
   const renderAnalysisResults = () => {
     if (!analysisData) return null;
 
-    if (!Array.isArray(analysisData)) {
+    if (!Array.isArray(analysisData) && currentAnalysis !== "get_categories") {
       return (
         <div className="analysis-results">
           <h3>Analysis Results</h3>
@@ -41,6 +41,68 @@ function GetInfo() {
     }
 
     switch (currentAnalysis) {
+      case "get_categories": {
+        const {
+          int_fields = [],
+          float_fields = [],
+          str_fields = [],
+          date_fields = [],
+          bool_fields = [],
+        } = analysisData || {};
+
+        const categories = [
+          { key: "int_fields", label: "Integer", columns: int_fields },
+          { key: "float_fields", label: "Float", columns: float_fields },
+          { key: "str_fields", label: "String", columns: str_fields },
+          { key: "date_fields", label: "Date", columns: date_fields },
+          { key: "bool_fields", label: "Boolean", columns: bool_fields },
+        ];
+
+        return (
+          <div className="analysis-results get_categories">
+            <h3>Column Categories</h3>
+            <div className="analysis-table-wrapper">
+              <table className="analysis-table">
+                <thead>
+                  <tr>
+                    <th>Data Type</th>
+                    <th>Column</th>
+                    <th>Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {categories.map((cat) => {
+                    const cols = cat.columns || [];
+                    if (!cols || cols.length === 0) {
+                      return (
+                        <tr key={cat.key}>
+                          <td>{cat.label}</td>
+                          <td>
+                            <em>None</em>
+                          </td>
+                          <td>0</td>
+                        </tr>
+                      );
+                    }
+
+                    return cols.map((colName, idx) => (
+                      <tr key={`${cat.key}-${colName}-${idx}`}>
+                        {idx === 0 && (
+                          <td rowSpan={cols.length}>{cat.label}</td>
+                        )}
+                        <td>{colName}</td>
+                        {idx === 0 && (
+                          <td rowSpan={cols.length}>{cols.length}</td>
+                        )}
+                      </tr>
+                    ));
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      }
       case "get_nulls":
         return (
           <div className="analysis-results get_nulls">
@@ -150,7 +212,7 @@ function GetInfo() {
                               <td>{percentage}%</td>
                             </tr>
                           );
-                        }
+                        },
                       )}
                     </tbody>
                   </table>
@@ -191,6 +253,13 @@ function GetInfo() {
             >
               <span>📈</span>
               Get Value Counts
+            </button>
+            <button
+              className="analysis-btn"
+              onClick={() => handleAnalysis("get_categories")}
+            >
+              <span>🗂️</span>
+              Get Categories
             </button>
           </div>
         </div>
