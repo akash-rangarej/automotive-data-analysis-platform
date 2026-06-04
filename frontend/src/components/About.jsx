@@ -66,6 +66,18 @@ function About() {
                 <li>Download ready-to-use datasets</li>
               </ul>
             </div>
+
+            <div className="feature-card">
+              <div className="feature-icon">&#129504;</div>
+              <h3>Model Training</h3>
+              <ul>
+                <li>Classification and regression support</li>
+                <li>Train multiple algorithms by model family</li>
+                <li>Select any dataset column as the target</li>
+                <li>Automatically evaluate model performance</li>
+                <li>Compare accuracy and R2 scores</li>
+              </ul>
+            </div>
           </div>
         </section>
 
@@ -88,7 +100,7 @@ function About() {
               <div className="step-number">2</div>
               <div className="step-content">
                 <h3>Choose Your Analysis</h3>
-                <p>Select from three main options: Get Info, Visualize, or Process Data</p>
+                <p>Select Get Info, Visualize, Process Data, or Model Training</p>
               </div>
             </div>
 
@@ -96,7 +108,7 @@ function About() {
               <div className="step-number">3</div>
               <div className="step-content">
                 <h3>Get Instant Results</h3>
-                <p>Receive comprehensive analysis, beautiful visualizations, or ML-ready data</p>
+                <p>Receive analysis, visualizations, ML-ready data, or model performance comparisons</p>
               </div>
             </div>
           </div>
