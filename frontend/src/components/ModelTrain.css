@@ -1,0 +1,213 @@
+.model-train {
+  animation: fadeInUp 0.5s ease-out;
+  max-width: 100%;
+}
+
+.model-train h2 {
+  color: var(--text-primary);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+.training-options,
+.training-results {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+  overflow: hidden;
+  padding: 2rem;
+  position: relative;
+}
+
+.training-options::after,
+.training-results::after {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  content: "";
+  height: 4px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.training-options h3,
+.training-results h3 {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.training-options p,
+.training-results p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.training-control-group {
+  align-items: flex-end;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(160px, 1fr)) auto;
+}
+
+.training-form-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.training-form-control label {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.training-form-select {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  padding: 0.75rem 1rem;
+  transition: var(--transition);
+  width: 100%;
+}
+
+.training-form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1);
+  outline: none;
+}
+
+.train-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  color: white;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  min-width: 145px;
+  padding: 0.8rem 1.5rem;
+  transition: var(--transition);
+}
+
+.train-btn:hover:not(:disabled) {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.train-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.training-state {
+  align-items: center;
+  background: var(--secondary-color);
+  border-radius: var(--border-radius);
+  color: var(--text-secondary);
+  display: flex;
+  font-weight: 500;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding: 1rem 1.5rem;
+}
+
+.training-spinner {
+  animation: spin 1s linear infinite;
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  flex-shrink: 0;
+  height: 20px;
+  width: 20px;
+}
+
+.results-table-wrapper {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow-x: auto;
+}
+
+.results-table {
+  border-collapse: collapse;
+  min-width: 480px;
+  width: 100%;
+}
+
+.results-table th,
+.results-table td {
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.9rem 1rem;
+  text-align: left;
+}
+
+.results-table th {
+  background: var(--secondary-color);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.results-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.results-table tbody tr:hover {
+  background: #fef2f2;
+}
+
+.results-table .metric-value {
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+
+@media (max-width: 1050px) {
+  .training-control-group {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .model-train {
+    padding: 0 0.5rem;
+  }
+
+  .training-options,
+  .training-results {
+    padding: 1.5rem;
+  }
+
+  .training-control-group {
+    grid-template-columns: 1fr;
+  }
+
+  .training-form-select {
+    font-size: 16px;
+  }
+
+  .train-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .model-train h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .training-options,
+  .training-results {
+    padding: 1rem;
+  }
+}

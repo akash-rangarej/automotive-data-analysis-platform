@@ -3,6 +3,7 @@ import FileUpload from "./components/FileUpload.jsx";
 import GetInfo from "./components/GetInfo.jsx";
 import Visualize from "./components/Visualize.jsx";
 import GetProcessedData from "./components/GetProcessedData.jsx";
+import ModelTrain from "./components/ModelTrain.jsx";
 import About from "./components/About.jsx";
 import "./App.css";
 
@@ -15,6 +16,7 @@ function App() {
     { key: "info", label: "Get Info", icon: "ℹ️" },
     { key: "visualize", label: "Visualize", icon: "📊" },
     { key: "processed", label: "Processed Data", icon: "⚡" },
+   { key: "train", label: "Train Models", icon: "🤖" },
     { key: "about", label: "About", icon: "❓" }
   ];
 
@@ -24,6 +26,7 @@ function App() {
       case "info": return <GetInfo />;
       case "visualize": return <Visualize />;
       case "processed": return <GetProcessedData />;
+      case "train": return <ModelTrain />;
        case "about": return <About />;
       default: return <FileUpload />;
     }

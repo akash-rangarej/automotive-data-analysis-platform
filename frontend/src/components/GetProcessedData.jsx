@@ -1,13 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./GetProcessedData.css";
 
 function GetProcessedData() {
   const [selectedStep, setSelectedStep] = useState("");
   const [error, setError] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
-  const [target_column, setTarget_column] = useState("");
+  const [target_column, setTarget_column] = useState("no");
+  const [columns, setColumns] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    const fetchColumns = async () => {
+      try {
+        const response = await fetch("/get_columns");
+        if (!response.ok) {
+          throw new Error("Unable to load dataset columns");
+        }
+
+        const data = await response.json();
+        setColumns(data.columns || []);
+      } catch (error) {
+        console.error("Error fetching columns:", error);
+        setError(error.message);
+      }
+    };
+
+    fetchColumns();
+  }, []);
 
   const handleStepProcessing = async () => {
     if (!selectedStep) {
@@ -195,12 +215,18 @@ function GetProcessedData() {
           {selectedStep === "encode_categorical" && (
             <div className="form-control">
               <label>Target Column</label>
-              <input 
-                type="text" 
-                className="form-input"
-                placeholder="Enter target column name or 'no'" 
+              <select
+                className="form-select"
+                value={target_column}
                 onChange={(e) => setTarget_column(e.target.value)}
-              />
+              >
+                <option value="no">No target column</option>
+                {columns.map(column => (
+                  <option key={column} value={column}>
+                    {column}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
 
@@ -245,12 +271,18 @@ function GetProcessedData() {
 
           <div className="form-control">
             <label>Target Column (for encoding)</label>
-            <input 
-              type="text" 
-              className="form-input"
-              placeholder="Enter target column name or 'no'" 
+            <select
+              className="form-select"
+              value={target_column}
               onChange={(e) => setTarget_column(e.target.value)}
-            />
+            >
+              <option value="no">No target column</option>
+              {columns.map(column => (
+                <option key={column} value={column}>
+                  {column}
+                </option>
+              ))}
+            </select>
           </div>
 
           <button 

@@ -149,9 +149,6 @@ def remove_outliers(df):
 
 
 
-
-
-
 # Main function for full preprocessing pipeline
 def get_fully_processed_data(df, model_type,target_column):
     model_types = ['linear_models','tree_models','distance_based_models','clustering_models','neural_network','naive_bayes']

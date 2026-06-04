@@ -377,11 +377,8 @@ def get_processed_data():
             elif processing_type == 'scale_features':
                 processed_df = scale_features(processed_df)
             elif processing_type == 'encode_categorical':
-                if target_column and target_column != 'no':
-                    if target_column not in uploaded_data.columns:
-                        return jsonify({"error": f"Target column '{target_column}' not found in dataset"}), 400
-                    if uploaded_data[target_column].dtype not in ['object', 'category']:
-                        return jsonify({"error": "The provided target column is not categorical data"}), 400
+                if uploaded_data[target_column].dtype not in ['object', 'category']:
+                    return jsonify({"error": "The provided target column is not categorical data"}), 400
             
                 processed_df = encode_categorical(processed_df, target_column)
             elif processing_type == 'remove_outliers':
@@ -402,6 +399,40 @@ def get_processed_data():
     except Exception as e:
         print(f"Error processing data: {str(e)}")
         return jsonify({"error": f"Error processing data: {str(e)}"}), 500
+
+
+
+
+from model_train import train_models
+@app.route("/get_trained_model",methods=['GET','POST'])
+def get_trained_model():
+    try:
+        global uploaded_data
+        if uploaded_data is None:
+            return jsonify({'error': 'No dataset uploaded. Please upload a dataset first.'}), 400
+        
+        data = request.get_json()
+        problem_type = data.get('problem_type')
+        model_type = data.get('model_type')
+        target_column = data.get('target_column')
+
+        if not model_type :
+            return jsonify({"error":"Model type is required for full preprocessing to train the model"}), 400
+        if not problem_type:
+            return jsonify({"error":"Problem type is required for model training"}), 400
+        if not target_column:
+            return jsonify({"error":"Target column is required for model training"}), 400
+        if target_column not in uploaded_data.columns:
+            return jsonify({"error":f"Target column '{target_column}' not found in dataset"}), 400
+
+        accuraries = train_models(uploaded_data,model_type,target_column,problem_type)
+
+        return jsonify({"accuracies":accuraries}), 200
+
+    except Exception as e:
+        print(f"Error processing data: {str(e)}")
+        return jsonify({"error": f"Error processing data: {str(e)}"}), 500
+    
 
 if __name__ == "__main__":
     app.run(debug=True)
